@@ -5,7 +5,8 @@
 These scripts are designed to be used with (spotlight)[https://github.com/projectblacklight/spotlight] exhibit app.
 These scripts provide the ability to explore the database tables and to clean up data.
 
-*WARNING: The scripts that delete table entries can NOT be undone.  Use with extreme caution!!!*
+![warning32](https://cloud.githubusercontent.com/assets/6855473/13064700/3f18cd1a-d423-11e5-9c1e-9c52cc0024fb.png)
+ *WARNING: The scripts that delete table entries can NOT be undone.  Use with extreme caution!!!*
 If you are not 100% sure what these scripts do and that you need to delete database entries this way, then do not use these scripts.
 
 ## Installation
