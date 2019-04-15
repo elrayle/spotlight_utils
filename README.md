@@ -1,5 +1,7 @@
 ## Overview
 
+*USED WITH SPOTLIGHT 1.4*
+
 These scripts are designed to be used with (spotlight)[https://github.com/projectblacklight/spotlight] exhibit app.
 These scripts provide the ability to explore the database tables and to clean up data.
 
