@@ -97,6 +97,9 @@ Things to watch for...  search results for ALT which will show
 
 ### Delete featured_images with image==null
 
+![warning32](https://cloud.githubusercontent.com/assets/6855473/13064700/3f18cd1a-d423-11e5-9c1e-9c52cc0024fb.png)
+ **WARNING: USE WITH CAUTION.  Sometimes a featured image is null but is still in use in another context.  Deleting just because it was nil may lead to issues with thumbnails and other uses.
+
 #### Find with
 ```
 ids = FeaturedImageDeleteService.find_null_images
