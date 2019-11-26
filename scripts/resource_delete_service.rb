@@ -17,6 +17,7 @@ class ResourceDeleteService
       puts 'find_resources_for_exhibit(exhibit:, limit: 1000)'
       puts '  # @param [Integer] exhibit id'
       puts '  # @return [Array<Integer>] resource_ids - list of ids of resources with image=NULL'
+      puts 'find_resources_without_an_exhibit'
       puts 'count_null_images'
       puts '  # @return [Integer] the number of resources with image=NULL'
       puts 'delete_resources(resource_ids, pretest: false'
@@ -48,6 +49,17 @@ class ResourceDeleteService
       resource_ids
     end
 
+    # @return [Array<Integer>] resource_ids - list of ids of resources with image=NULL
+    def find_resources_without_an_exhibit
+      puts "Resources without an exhibit"
+      all_resource_exhibit_ids = Spotlight::Resource.all.map(&:exhibit_id).uniq.sort
+      all_exhibit_ids = Spotlight::Exhibit.all.map(&:id).sort
+      resource_exhibits_that_donot_exist = all_resource_exhibit_ids - all_exhibit_ids
+      resource_exhibits_that_donot_exist.each do |exhibit_id|
+        ExhibitService.counts exhibit_id
+      end
+    end
+
     # @return [Integer] the number of resources with image=NULL'
     def count_null_images
       ids = find_null_images
@@ -67,12 +79,13 @@ class ResourceDeleteService
       return if resource.blank?
 
       featured_image = find_featured_image(resource)
+      alt_resources_with_image = find_alternate_resource_for_image(resource)
       thumbnails = find_thumbnails(featured_image)
       solr_document_sidecars = find_solr_document_sidecars(resource)
       bookmarks = find_bookmarks(solr_document_sidecars)
 
-      perform_pretest(resource: resource, featured_image: featured_image, thumbnails: thumbnails,
-                      solr_document_sidecars: solr_document_sidecars, bookmarks: bookmarks)
+      perform_pretest(resource: resource, featured_image: featured_image, alternate_resources_for_image: alt_resources_with_image,
+                      thumbnails: thumbnails, solr_document_sidecars: solr_document_sidecars, bookmarks: bookmarks)
       return if pretest
       return unless delete?
       perform_deletes(resource: resource, featured_image: featured_image, thumbnails: thumbnails,
@@ -95,11 +108,15 @@ class ResourceDeleteService
         puts("DELETE Complete!")
       end
 
-      def perform_pretest(resource:, featured_image:, thumbnails: [], solr_document_sidecars: [], bookmarks: [])
+      def perform_pretest(resource:, featured_image:, alternate_resources_for_image: [], thumbnails: [], solr_document_sidecars: [], bookmarks: [])
         puts "-----------------------------------"
         puts("Will DELETE...")
         puts("    resource - id: #{resource.id}    type: #{resource.type}    upload_id: #{resource.upload_id}    exhibit_id: #{resource.exhibit_id}")
         puts("    featured image - id: #{featured_image.id}    type: #{featured_image.type}    image: #{featured_image.image}") if featured_image
+        Spotlight::Resource.where(upload_id: resource.upload_id).each do |r|
+          next if r.id == resource.id || resource.upload_id.blank?
+          puts("       ALT resource with upload_id: #{resource.upload_id}   resource - id: #{r.id}    exhibit_id: #{r.exhibit_id}")
+        end unless resource.upload_id.blank?
         thumbnails.each { |t| puts("    thumbnail - id: #{t.id}    type: #{t.type}    image: #{t.image}    iiif_tilesource: #{t.iiif_tilesource}") }
         solr_document_sidecars.each { |d| puts("    solr_document_sidecar - id: #{d.id}    document_id: #{d.document_id}    document_type: #{d.document_type}    resource_id: #{d.resource_id}    exhibit_id: #{d.exhibit_id}") }
         bookmarks.each { |b| puts("    bookmark - id: #{b.id}") }
