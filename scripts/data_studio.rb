@@ -8,25 +8,25 @@
 #     DataStudio.curation_pages_field
 
 class DataStudio
-  # To setup the field in datastudio:
+  # To setup the Published Exhibits field in Data Studio:
   #   * click any widget that uses data
   #   * select DATA tab on right
   #   * click ADD A FIELD
-  #   * set Field Name to Exhibits
+  #   * set Field Name to Published Exhibits
   #   * set Formula to the results of this method
-  def self.exhibits_field(published: true)
+  def self.published_exhibits_field
     instructions = <<-INSTRUCTIONS
-# To setup the field in datastudio:
+# To setup the Published Exhibits field in Data Studio:
 #   * click any widget that uses data
 #   * select DATA tab on right
 #   * click ADD A FIELD
-#   * set Field Name to Exhibits
+#   * set Field Name to Published Exhibits
 #   * set Formula to the results of this method
 # DO NOT INCLUDE THESE INSTRUCTIONS IN THE FORMULA
 
     INSTRUCTIONS
 
-    exhibits = published ? Spotlight::Exhibit.where(published: true) : Spotlight::Exhibit.all
+    exhibits = Spotlight::Exhibit.where(published: true)
 
     field = <<-FIELD
 CASE
