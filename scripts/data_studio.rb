@@ -14,7 +14,7 @@ class DataStudio
   #   * click ADD A FIELD
   #   * set Field Name to Exhibits
   #   * set Formula to the results of this method
-  def self.exhibits_field
+  def self.exhibits_field(published: true)
     instructions = <<-INSTRUCTIONS
 # To setup the field in datastudio:
 #   * click any widget that uses data
@@ -26,7 +26,7 @@ class DataStudio
 
     INSTRUCTIONS
 
-    exhibits = Spotlight::Exhibit.all
+    exhibits = published ? Spotlight::Exhibit.where(published: true) : Spotlight::Exhibit.all
 
     field = <<-FIELD
 CASE
