@@ -3,24 +3,26 @@
 # To use:
 #   Run rails console: bundle exec rails c <RAILS_ENV>
 #   Load the script: load 'scripts/data_studio.rb'
-#   Get code to use in datastudio:
+#   Get code to use in Google Data Studio:
 #     DataStudio.exhibits_field
-#     DataStudio.curation_pages_field
+#     DataStudio.include_published_exhibits_filter
+#     DataStudio.admin_pages_field
+#     DataStudio.exclude_admin_pages_filter
 
 class DataStudio
   # To setup the Published Exhibits field in Data Studio:
   #   * click any widget that uses data
   #   * select DATA tab on right
   #   * click ADD A FIELD
-  #   * set Field Name to Published Exhibits
+  #   * set Field Name to Exhibits
   #   * set Formula to the results of this method
-  def self.published_exhibits_field
+  def self.exhibits_field
     instructions = <<-INSTRUCTIONS
-# To setup the Published Exhibits field in Data Studio:
+# To setup the Exhibits field in Data Studio:
 #   * click any widget that uses data
 #   * select DATA tab on right
 #   * click ADD A FIELD
-#   * set Field Name to Published Exhibits
+#   * set Field Name to Exhibits
 #   * set Formula to the results of this method
 # DO NOT INCLUDE THESE INSTRUCTIONS IN THE FORMULA
 
@@ -28,21 +30,11 @@ class DataStudio
 
     exhibits = Spotlight::Exhibit.where(published: true)
 
-    field = <<-FIELD
-CASE
-WHEN (Page='/') THEN 'Home'
-    FIELD
-
+    field = "CASE\n"
     exhibits.each do |ex|
       field += "WHEN (REGEXP_MATCH(Page, '.*#{ex.slug}.*')) THEN '#{ex.title}'\n"
     end
-
-    field = <<-FIELD.strip_heredoc
-#{field}
-ELSE 'Unpushished'
-END
-    FIELD
-    field.gsub!("\n\n", "\n")
+    field += "ELSE 'Unpublished'\nEND"
 
     puts instructions
     puts ' '
@@ -51,9 +43,9 @@ END
     field
   end
 
-  def self.published_exhibits_filter
+  def self.include_published_exhibits_filter
     instructions = <<-INSTRUCTIONS
-# To setup the filter in datastudio:
+# To setup the filter in Data Studio:
 #   * select menu Resource -> Manage filters
 #   * click + ADD A FILTER
 #   * set Filter Name to Published Exhibits filter
@@ -75,7 +67,7 @@ END
 
   def self.admin_pages_field
     instructions = <<-INSTRUCTIONS
-# To setup the field in datastudio:
+# To setup the field in Data Studio:
 #   * click any widget that uses data
 #   * select DATA tab on right
 #   * click ADD A FIELD
@@ -116,7 +108,7 @@ END
 
   def self.exclude_admin_pages_filter
     instructions = <<-INSTRUCTIONS
-# To setup the filter in datastudio:
+# To setup the filter in Data Studio:
 #   * select menu Resource -> Manage filters
 #   * click + ADD A FILTER
 #   * set Filter Name to Exclude Admin Pages filter
